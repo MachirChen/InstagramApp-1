@@ -46,23 +46,25 @@ class InstagramCollectionViewController: UICollectionViewController {
     */
 
     // MARK: UICollectionViewDataSource
-
+    //設定Section數量
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1
     }
 
-
+    //設定Cell數量
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of items
         return instagramPostPicture.count
     }
 
+    //設定照片牆 Cell 顯示的相關訊息
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        //先將cell轉型成自訂型別
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? InstagramCollectionViewCell else { return UICollectionViewCell()}
         
         let item = instagramPostPicture[indexPath.item]
-        //抓Post圖片
+        //再透過URLSession在背景抓Post圖片，最後使用DispatchQueue.main.async顯示在主畫面
         URLSession.shared.dataTask(with: item.node.display_url) { data, response, error in
             if let data = data {
                 DispatchQueue.main.async {
@@ -74,10 +76,12 @@ class InstagramCollectionViewController: UICollectionViewController {
         return cell
     }
     
+    //回傳ReusableView顯示的內容
     override func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
+        //參數ofKind設定為Header類型，參數withReuseIdentifier則是輸入CollectionReusableView的ID，最後將resuableView轉型成自訂型別
         guard let resuableView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: "InstagramHeaderCollectionReusableView", for: indexPath) as? InstagramHeaderCollectionReusableView else { return UICollectionReusableView() }
         
-        //抓簡介圖片
+        //透過URLSession在背景抓簡介的圖片，最後使用DispatchQueue.main.async顯示在主畫面，並且設定圖片圓角，使圖片顯示為圓型
         if let profilPicUrl = self.instagramData?.graphql.user.profile_pic_url_hd {
             URLSession.shared.dataTask(with: profilPicUrl) { data, response, error in
                 if let data = data {
@@ -98,12 +102,12 @@ class InstagramCollectionViewController: UICollectionViewController {
            let followingCount = self.instagramData?.graphql.user.edge_follow.count,
            let fullName = self.instagramData?.graphql.user.username,
            let biography = self.instagramData?.graphql.user.biography {
-            resuableView.postsLabel.text = numCoverter(postCount)
-            resuableView.followersLabel.text = numCoverter(followCount)
-            resuableView.followingLabel.text = numCoverter(followingCount)
-            resuableView.fullNameLabel.text = "\(fullName)"
+            resuableView.postsLabel.text = numCoverter(postCount) //貼文數量
+            resuableView.followersLabel.text = numCoverter(followCount) //粉絲人數
+            resuableView.followingLabel.text = numCoverter(followingCount) //追蹤者
+            resuableView.fullNameLabel.text = "\(fullName)" //名稱
             resuableView.biographyTextView.isEditable = false
-            resuableView.biographyTextView.text = "\(biography)"
+            resuableView.biographyTextView.text = "\(biography)" //自傳
         }
         return resuableView
     }
