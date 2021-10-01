@@ -13,7 +13,8 @@ class InstagramCollectionViewController: UICollectionViewController {
     
     var instagramData: InstagramResponse?
     var instagramPostPicture = [InstagramResponse.Graphql.User.Edge_owner_to_timeline_media.Edges]()
-
+    
+    //透過IBSeguAction傳遞選中圖片的相關貼文資訊
     @IBSegueAction func showPostDetail(_ coder: NSCoder) -> InstagramPostDetailCollectionViewController? {
         
         guard let row = collectionView.indexPathsForSelectedItems?.first?.row else {return nil}

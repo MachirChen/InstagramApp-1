@@ -17,7 +17,7 @@ class InstagramPostDetailCollectionViewController: UICollectionViewController {
     var instagramProfileUserName: String
     var instagramProfilePicURL: URL
     var indexPath: Int
-    var isShow = false
+    
     //資料是從storyboard生成，將呼叫init(coder:)
     init?(coder: NSCoder, instagramData: InstagramResponse, indexPath: Int) {
         self.instagramPostInfo = instagramData.graphql.user.edge_owner_to_timeline_media
@@ -54,7 +54,7 @@ class InstagramPostDetailCollectionViewController: UICollectionViewController {
 
         // Do any additional setup after loading the view.
     }
-    
+    var isShow = false //設定isShow使程式只在第一次點擊時觸發
     override func viewDidLayoutSubviews() {
         super.viewDidLayoutSubviews()
         if isShow == false {
@@ -77,21 +77,24 @@ class InstagramPostDetailCollectionViewController: UICollectionViewController {
 
     // MARK: UICollectionViewDataSource
 
+    //設定Section數量
     override func numberOfSections(in collectionView: UICollectionView) -> Int {
         // #warning Incomplete implementation, return the number of sections
         return 1
     }
 
-
+    //設定Cell數量
     override func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of items
         return instagramPostInfo.edges.count
     }
 
+    //設定貼文 Cell 顯示的相關訊息
     override func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
+        //先將cell轉型成自訂型別
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: reuseIdentifier, for: indexPath) as? InstagramPostDetailCollectionViewCell else { return UICollectionViewCell() }
     
-        //抓Post圖片
+        //再透過URLSession在背景抓Post圖片，最後使用DispatchQueue.main.async顯示在主畫面
         URLSession.shared.dataTask(with: instagramPostInfo.edges[indexPath.item].node.display_url) { data, response, error in
             if let data = data {
                 DispatchQueue.main.async {
